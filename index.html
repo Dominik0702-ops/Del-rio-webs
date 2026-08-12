@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Del Río Webs — Descuento de bienvenida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1729;
+    --ink-soft:#182236;
+    --paper:#F6F4EF;
+    --paper-dim:#EDEAE2;
+    --river:#2D6CDF;
+    --river-deep:#1E4FB8;
+    --foam:#4FD1C5;
+    --amber:#F2A93B;
+    --slate:#8B94A8;
+    --danger:#E15554;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
+
+  .wrap{min-height:100vh;display:flex;}
+  @media (max-width:860px){ .wrap{flex-direction:column;} }
+
+  /* LEFT — river panel */
+  .panel{
+    flex:1 1 42%;
+    background:linear-gradient(160deg,var(--ink) 0%,var(--ink-soft) 100%);
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+    padding:48px 44px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:280px;
+  }
+  .panel svg.rivers{position:absolute;inset:0;width:100%;height:100%;opacity:.55;}
+  .panel .path-a{stroke:var(--river);stroke-width:2;fill:none;stroke-dasharray:6 10;animation:flow 14s linear infinite;}
+  .panel .path-b{stroke:var(--foam);stroke-width:1.4;fill:none;stroke-dasharray:4 9;opacity:.6;animation:flow 20s linear infinite reverse;}
+  @keyframes flow{ to{ stroke-dashoffset:-400; } }
+  @media (prefers-reduced-motion:reduce){ .path-a,.path-b{animation:none;} }
+
+  .brand{position:relative;z-index:1;}
+  .brand-mark{display:flex;align-items:center;gap:10px;margin-bottom:38px;}
+  .brand-dot{width:9px;height:9px;border-radius:50%;background:var(--foam);}
+  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:.02em;}
+
+  .headline{position:relative;z-index:1;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.14;max-width:420px;}
+  .headline span{color:var(--foam);}
+  .sub{position:relative;z-index:1;color:var(--slate);font-size:14.5px;line-height:1.6;max-width:380px;margin-top:16px;}
+
+  .contact{position:relative;z-index:1;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--paper);opacity:.75;}
+
+  /* RIGHT — form panel */
+  .stage{
+    flex:1 1 58%;
+    display:flex;align-items:center;justify-content:center;
+    padding:40px 24px;
+  }
+  .card{
+    width:100%;max-width:400px;
+    background:#fff;
+    border:1px solid var(--paper-dim);
+    border-radius:var(--radius);
+    padding:34px 30px;
+    box-shadow:0 1px 2px rgba(15,23,41,.04);
+  }
+
+  .tabs{display:flex;background:var(--paper-dim);border-radius:10px;padding:4px;margin-bottom:26px;}
+  .tab{flex:1;text-align:center;padding:9px 0;font-size:13.5px;font-weight:600;border-radius:7px;cursor:pointer;color:var(--slate);transition:.15s;user-select:none;}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(15,23,41,.08);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:7px;}
+  .field input{
+    width:100%;padding:12px 13px;border:1.5px solid var(--paper-dim);border-radius:9px;
+    font-size:14.5px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--paper);
+    outline:none;transition:.15s;
+  }
+  .field input:focus{border-color:var(--river);background:#fff;}
+
+  .btn{
+    width:100%;padding:12.5px 0;border:none;border-radius:9px;
+    background:var(--river);color:#fff;font-weight:600;font-size:14.5px;
+    cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;
+  }
+  .btn:hover{background:var(--river-deep);}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--river);border:1.5px solid var(--paper-dim);margin-top:8px;}
+  .btn-ghost:hover{border-color:var(--river);background:var(--paper);}
+
+  .msg{font-size:13px;margin:2px 0 16px;line-height:1.5;}
+  .msg.error{color:var(--danger);}
+  .msg.ok{color:#1c8a72;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* redeem screen */
+  .discount-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(90deg,var(--amber),#f7c979);
+    color:var(--ink);font-family:'IBM Plex Mono',monospace;font-weight:600;
+    font-size:20px;letter-spacing:.06em;padding:14px 18px;border-radius:10px;width:100%;
+    justify-content:center;margin:14px 0 6px;
+  }
+  .hello{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;margin-bottom:4px;}
+  .muted{color:var(--slate);font-size:13.5px;line-height:1.6;margin-bottom:20px;}
+  .logout{text-align:center;margin-top:16px;}
+  .logout a{color:var(--slate);font-size:12.5px;cursor:pointer;text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="panel">
+    <svg class="rivers" viewBox="0 0 400 500" preserveAspectRatio="none">
+      <path class="path-a" d="M -20 60 C 100 20, 150 140, 300 100 S 420 200, 380 260"/>
+      <path class="path-a" d="M -20 220 C 120 180, 160 300, 320 260 S 440 360, 400 420"/>
+      <path class="path-b" d="M -20 140 C 90 110, 170 220, 300 180 S 430 280, 390 340"/>
+      <path class="path-b" d="M -20 340 C 110 300, 180 420, 330 390 S 430 460, 400 500"/>
+    </svg>
+    <div class="brand">
+      <div class="brand-mark">
+        <div class="brand-dot"></div>
+        <div class="brand-name">DEL RÍO WEBS</div>
+      </div>
+      <div class="headline">Crea tu cuenta y <span>desbloquea tu descuento</span> en tu próxima página web.</div>
+      <div class="sub">Regístrate, ingresa el código que te dimos y aplícalo a tu próximo proyecto con nosotros.</div>
+    </div>
+    <div class="contact">Pedidos: 877&nbsp;253&nbsp;7139</div>
+  </div>
+
+  <div class="stage">
+    <div class="card">
+
+      <!-- AUTH VIEW -->
+      <div id="view-auth" class="view active">
+        <div class="tabs">
+          <div class="tab active" data-mode="login">Iniciar sesión</div>
+          <div class="tab" data-mode="register">Crear cuenta</div>
+        </div>
+
+        <div class="msg error" id="auth-msg" style="display:none;"></div>
+
+        <form id="auth-form">
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input type="email" id="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <input type="password" id="password" required autocomplete="current-password" minlength="6">
+          </div>
+          <button type="submit" class="btn" id="submit-btn">Iniciar sesión</button>
+        </form>
+      </div>
+
+      <!-- REDEEM VIEW -->
+      <div id="view-redeem" class="view">
+        <div class="hello">Hola de nuevo 👋</div>
+        <div class="muted" id="redeem-email"></div>
+
+        <div id="redeem-pending">
+          <div class="field">
+            <label>Código de descuento</label>
+            <input type="text" id="code-input" placeholder="Ej. DELRIO10" autocomplete="off">
+          </div>
+          <div class="msg error" id="code-msg" style="display:none;"></div>
+          <button class="btn" id="apply-code-btn">Aplicar código</button>
+        </div>
+
+        <div id="redeem-done" style="display:none;">
+          <div class="discount-badge" id="active-code"></div>
+          <div class="muted">Este código ya está activo en tu cuenta. Menciónalo al hacer tu pedido para aplicar tu descuento.</div>
+        </div>
+
+        <div class="logout"><a id="logout-link">Cerrar sesión</a></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Pega aquí la URL de tu Web App de Google Apps Script (Implementar > Nueva implementación)
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-1KlUB9v6FMjAEjltqVFEc5lNU4qlGcI_sPNz9c9N7pdMbk_W8a3DE6yKmm9BcwtB/exec";
+  async function callBackend(payload){
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  }
+
+  const authView = document.getElementById('view-auth');
+  const redeemView = document.getElementById('view-redeem');
+  const tabs = document.querySelectorAll('.tab');
+  const authForm = document.getElementById('auth-form');
+  const authMsg = document.getElementById('auth-msg');
+  const submitBtn = document.getElementById('submit-btn');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+
+  let mode = 'login';
+  let currentUser = null;
+
+  function showAuthMsg(text){
+    authMsg.textContent = text;
+    authMsg.style.display = text ? 'block' : 'none';
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    mode = t.dataset.mode;
+    submitBtn.textContent = mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+    showAuthMsg('');
+  }));
+
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    showAuthMsg('');
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+    submitBtn.disabled = true;
+
+    if(APPS_SCRIPT_URL.indexOf('PEGA_AQUI') !== -1){
+      showAuthMsg('Falta configurar la URL de tu backend (APPS_SCRIPT_URL) en el código.');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    try{
+      const result = await callBackend({ action: mode, email, password });
+
+      if(mode === 'register'){
+        if(!result.ok){
+          showAuthMsg(result.error === 'exists'
+            ? 'Ya existe una cuenta con este correo. Prueba iniciar sesión.'
+            : 'No se pudo crear la cuenta. Intenta de nuevo.');
+          submitBtn.disabled = false;
+          return;
+        }
+        currentUser = { email, discountCode: result.discountCode || null };
+        enterRedeemView();
+      } else {
+        if(!result.ok){
+          showAuthMsg('Correo o contraseña incorrectos.');
+          submitBtn.disabled = false;
+          return;
+        }
+        currentUser = { email, discountCode: result.discountCode || null };
+        enterRedeemView();
+      }
+    }catch(err){
+      showAuthMsg('No se pudo conectar con el servidor. Revisa tu conexión o la URL del backend.');
+    }
+    submitBtn.disabled = false;
+  });
+
+  function enterRedeemView(){
+    authView.classList.remove('active');
+    redeemView.classList.add('active');
+    document.getElementById('redeem-email').textContent = currentUser.email;
+
+    if(currentUser.discountCode){
+      showRedeemedState();
+    } else {
+      document.getElementById('redeem-pending').style.display = 'block';
+      document.getElementById('redeem-done').style.display = 'none';
+    }
+  }
+
+  function showRedeemedState(){
+    document.getElementById('redeem-pending').style.display = 'none';
+    document.getElementById('redeem-done').style.display = 'block';
+    document.getElementById('active-code').textContent = currentUser.discountCode;
+  }
+
+  document.getElementById('apply-code-btn').addEventListener('click', async () => {
+    const codeMsg = document.getElementById('code-msg');
+    codeMsg.style.display = 'none';
+    const input = document.getElementById('code-input').value.trim().toUpperCase();
+
+    if(!input){
+      codeMsg.textContent = 'Ingresa un código.';
+      codeMsg.style.display = 'block';
+      return;
+    }
+    try{
+      const result = await callBackend({ action: 'redeem', email: currentUser.email, code: input });
+      if(!result.ok){
+        codeMsg.textContent = result.error === 'invalid' ? 'Ese código no es válido.' : 'No se pudo aplicar el código.';
+        codeMsg.style.display = 'block';
+        return;
+      }
+      currentUser.discountCode = result.discountCode;
+      showRedeemedState();
+    }catch(err){
+      codeMsg.textContent = 'No se pudo conectar con el servidor. Intenta de nuevo.';
+      codeMsg.style.display = 'block';
+    }
+  });
+
+  document.getElementById('logout-link').addEventListener('click', () => {
+    currentUser = null;
+    authForm.reset();
+    showAuthMsg('');
+    redeemView.classList.remove('active');
+    authView.classList.add('active');
+  });
+})();
+</script>
+
+</body>
+</html>
