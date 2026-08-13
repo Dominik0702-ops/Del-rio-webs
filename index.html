@@ -192,12 +192,11 @@
 (function(){
   // Pega aquí la URL de tu Web App de Google Apps Script (Implementar > Nueva implementación)
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw38MLMfUae90FzrZVrDIGgjCYCWKgI4b1_PqyxBQyOmwrPsxfT9VHUNwb_HDHIi2-Ilg/exec";
+
   async function callBackend(payload){
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS
-      body: JSON.stringify(payload)
-    });
+    const url = new URL(APPS_SCRIPT_URL);
+    Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
+    const res = await fetch(url.toString());
     return await res.json();
   }
 
