@@ -193,11 +193,21 @@
   // Pega aquí la URL de tu Web App de Google Apps Script (Implementar > Nueva implementación)
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw38MLMfUae90FzrZVrDIGgjCYCWKgI4b1_PqyxBQyOmwrPsxfT9VHUNwb_HDHIi2-Ilg/exec";
 
-  async function callBackend(payload){
-    const url = new URL(APPS_SCRIPT_URL);
-    Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
-    const res = await fetch(url.toString());
-    return await res.json();
+  function callBackend(payload){
+    return new Promise((resolve, reject) => {
+      const callbackName = 'delrio_cb_' + Math.random().toString(36).slice(2);
+      const url = new URL(APPS_SCRIPT_URL);
+      Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
+      url.searchParams.append('callback', callbackName);
+
+      const script = document.createElement('script');
+      const cleanup = () => { delete window[callbackName]; script.remove(); };
+
+      window[callbackName] = (data) => { cleanup(); resolve(data); };
+      script.onerror = () => { cleanup(); reject(new Error('jsonp failed')); };
+      script.src = url.toString();
+      document.body.appendChild(script);
+    });
   }
 
   const authView = document.getElementById('view-auth');
